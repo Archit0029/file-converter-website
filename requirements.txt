@@ -1,0 +1,10 @@
+Flask
+fpdf
+Pillow
+python-docx
+werkzeug
+typing-extensions
+lxml
+itsdangerous
+colorama
+blinker
