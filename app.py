@@ -1,12 +1,14 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, send_file
+from PIL import Image
 import os
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads'
+app.config['CONVERTED_FOLDER'] = 'converted'
 
-# Make sure upload folder exists
-if not os.path.exists(app.config['UPLOAD_FOLDER']):
-    os.makedirs(app.config['UPLOAD_FOLDER'])
+# Ensure folders exist
+os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+os.makedirs(app.config['CONVERTED_FOLDER'], exist_ok=True)
 
 @app.route('/')
 def index():
@@ -22,10 +24,24 @@ def convert():
         return "No selected file"
     
     if file:
-        filepath = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
-        file.save(filepath)
-        return f"File uploaded and saved as {file.filename}"
-    
+        # Save original
+        input_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
+        file.save(input_path)
+
+        # Convert image
+        filename_wo_ext = os.path.splitext(file.filename)[0]
+        output_path = os.path.join(app.config['CONVERTED_FOLDER'], filename_wo_ext + '.png')
+        
+        try:
+            with Image.open(input_path) as img:
+                img = img.convert("RGB")
+                img.save(output_path, "PNG")
+        except Exception as e:
+            return f"Error converting file: {e}"
+
+        # Download converted file
+        return send_file(output_path, as_attachment=True)
+
     return "Something went wrong"
 
 if __name__ == '__main__':
