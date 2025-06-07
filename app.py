@@ -1,9 +1,8 @@
 from flask import Flask, render_template, request, send_file
 from PIL import Image
 from fpdf import FPDF
-import fitz
+import fitz  # PyMuPDF
 import os
-import mimetypes
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads'
@@ -51,12 +50,12 @@ def convert():
                     pdf.cell(200, 10, txt=line.strip(), ln=True)
             pdf.output(output_path)
 
-       elif ext == 'pdf':
-    doc = fitz.open(input_path)
-    page = doc.load_page(0)
-    pix = page.get_pixmap()
-    output_path = os.path.join(app.config['OUTPUT_FOLDER'], base_name + '_page1.png')
-    pix.save(output_path)
+        elif ext == 'pdf':
+            doc = fitz.open(input_path)
+            page = doc.load_page(0)
+            pix = page.get_pixmap()
+            output_path = os.path.join(app.config['OUTPUT_FOLDER'], base_name + '_page1.png')
+            pix.save(output_path)
 
         else:
             return "Unsupported file type"
