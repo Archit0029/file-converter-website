@@ -23,6 +23,15 @@
       padding: 20px;
       color: #333;
     }
+    .flash {
+  background: #d1f7d6;
+  color: #0a6e0a;
+  padding: 10px;
+  border-radius: 8px;
+  margin: 10px 0;
+  font-weight: bold;
+}
+
 
     .container {
       background: white;
@@ -236,6 +245,19 @@
     function toggleDarkMode() {
       document.body.classList.toggle('dark-mode');
     }
+    {% if download_url %}
+  <a href="{{ download_url }}" class="download-link" download>⬇ Download Converted File</a>
+{% endif %}
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <div class="flash-messages">
+      {% for message in messages %}
+        <div class="flash">{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
   </script>
 </body>
 </html>
