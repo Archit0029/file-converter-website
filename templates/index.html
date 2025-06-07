@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>File Converter | Education Hub</title>
-  <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="icon" href="{{ url_for('static', filename='images/favicon.ico') }}" type="image/x-icon" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
   <style>
     * {
       box-sizing: border-box;
@@ -21,29 +21,28 @@
       align-items: center;
       min-height: 100vh;
       padding: 20px;
+      color: #333;
     }
 
     .container {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(8px);
+      background: white;
       padding: 40px 30px;
-      border-radius: 25px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-      max-width: 480px;
-      width: 100%;
+      border-radius: 20px;
+      box-shadow: 0 20px 30px rgba(0, 0, 0, 0.15);
+      width: 95%;
+      max-width: 600px;
       text-align: center;
+      position: relative;
     }
 
     h1 {
       font-size: 2rem;
       margin-bottom: 5px;
-      color: #333;
     }
 
     p {
       font-size: 1rem;
-      color: #555;
-      margin-bottom: 20px;
+      margin-bottom: 25px;
     }
 
     .dropzone {
@@ -51,10 +50,10 @@
       border-radius: 15px;
       padding: 30px 20px;
       background-color: #f7fbff;
-      color: #666;
       font-size: 1rem;
       cursor: pointer;
-      margin-bottom: 20px;
+      margin-bottom: 15px;
+      color: #666;
     }
 
     .dropzone:hover {
@@ -64,6 +63,12 @@
 
     input[type="file"] {
       display: none;
+    }
+
+    .preview {
+      margin: 10px 0 20px;
+      font-size: 0.9rem;
+      word-break: break-word;
     }
 
     select {
@@ -86,19 +91,62 @@
       border: none;
       border-radius: 10px;
       cursor: pointer;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      position: relative;
     }
 
-    button:hover {
-      transform: scale(1.03);
-      box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+    button.loading::after {
+      content: '';
+      position: absolute;
+      right: 20px;
+      top: 50%;
+      width: 16px;
+      height: 16px;
+      border: 2px solid #fff;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      transform: translateY(-50%);
     }
 
-    .preview {
-      margin-top: 10px;
+    @keyframes spin {
+      to { transform: translateY(-50%) rotate(360deg); }
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #4facfe;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
       font-size: 0.9rem;
-      color: #333;
-      word-wrap: break-word;
+      display: none;
+    }
+
+    .dark-mode body {
+      background: #111;
+      color: #eee;
+    }
+
+    .dark-mode .container {
+      background: #222;
+      color: #fff;
+    }
+
+    .dark-toggle {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 0.9rem;
+      background: #eee;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 10px;
+      cursor: pointer;
     }
 
     footer {
@@ -107,16 +155,11 @@
       color: #fff;
       text-align: center;
     }
-
-    @media (max-width: 600px) {
-      .container {
-        padding: 30px 20px;
-      }
-    }
   </style>
 </head>
 <body>
   <div class="container">
+    <button class="dark-toggle" onclick="toggleDarkMode()">🌙</button>
     <h1>File Converter</h1>
     <p>Convert files to PDF, JPG, PNG, DOCX, or TXT</p>
 
@@ -136,9 +179,11 @@
         <option value="txt">TXT</option>
       </select>
 
-      <button type="submit">Convert</button>
+      <button type="submit" id="convertBtn">Convert</button>
     </form>
   </div>
+
+  <div class="toast" id="toast"></div>
 
   <footer>Created by Archit Bishnoi • Education Hub</footer>
 
@@ -146,11 +191,15 @@
     const dropzone = document.getElementById('dropzone');
     const fileInput = document.getElementById('fileInput');
     const fileName = document.getElementById('fileName');
+    const convertBtn = document.getElementById('convertBtn');
+    const toast = document.getElementById('toast');
 
     dropzone.addEventListener('click', () => fileInput.click());
 
     fileInput.addEventListener('change', () => {
-      fileName.textContent = fileInput.files.length ? fileInput.files[0].name : 'No file selected';
+      fileName.textContent = fileInput.files.length
+        ? fileInput.files[0].name
+        : 'No file selected';
     });
 
     dropzone.addEventListener('dragover', (e) => {
@@ -159,15 +208,34 @@
     });
 
     dropzone.addEventListener('dragleave', () => {
-      dropzone.style.backgroundColor = "";
+      dropzone.style.backgroundColor = "#f7fbff";
     });
 
     dropzone.addEventListener('drop', (e) => {
       e.preventDefault();
       fileInput.files = e.dataTransfer.files;
-      fileName.textContent = e.dataTransfer.files.length ? e.dataTransfer.files[0].name : 'No file selected';
-      dropzone.style.backgroundColor = "";
+      fileName.textContent = e.dataTransfer.files.length
+        ? e.dataTransfer.files[0].name
+        : 'No file selected';
+      dropzone.style.backgroundColor = "#f7fbff";
     });
+
+    document.getElementById('uploadForm').addEventListener('submit', (e) => {
+      convertBtn.classList.add('loading');
+      showToast('Uploading and converting file...');
+    });
+
+    function showToast(message) {
+      toast.textContent = message;
+      toast.style.display = 'block';
+      setTimeout(() => {
+        toast.style.display = 'none';
+      }, 3000);
+    }
+
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark-mode');
+    }
   </script>
 </body>
 </html>
