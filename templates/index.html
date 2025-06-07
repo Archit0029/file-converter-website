@@ -35,43 +35,25 @@
       margin-bottom: 5px;
       font-size: 2rem;
     }
-    .drop-zone {
-      border: 2px dashed #4facfe;
-      padding: 30px;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: 0.2s;
-      background-color: #f9f9f9;
-    }
-    .drop-zone:hover {
-      background-color: #f0faff;
-    }
-    .drop-zone.dragover {
-      border-color: #00c6ff;
-      background-color: #e0f7ff;
-    }
-    #file-input {
-      display: none;
-    }
-    select, button {
-      margin: 15px 0 10px;
-      padding: 12px;
-      border-radius: 10px;
-      border: 1px solid #ccc;
-      width: 100%;
-      font-size: 1rem;
-    }
-    button {
-      background-color: #4facfe;
-      color: white;
-      border: none;
-      cursor: pointer;
-      font-weight: bold;
-      transition: background 0.3s;
-    }
-    button:hover {
-      background-color: #00c6ff;
-    }
+   .drop-zone {
+  border: 2px dashed #4facfe;
+  padding: 30px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: 0.2s;
+  background-color: #f9f9f9;
+  margin-top: 20px;
+  margin-bottom: 20px; /* Add margin-bottom to separate from next element */
+}
+
+select {
+  margin-bottom: 20px; /* Add bottom margin to separate from button */
+}
+
+button {
+  margin-bottom: 10px;
+}
+
     footer {
       margin-top: 30px;
       font-size: 0.9rem;
@@ -83,21 +65,28 @@
   <div class="container">
     <h1>File Converter</h1>
     <p>Convert any file to your desired format</p>
-    <form action="/convert" method="post" enctype="multipart/form-data">
-      <label for="file-input" class="drop-zone" id="drop-zone">
-        <strong>Click to choose a file</strong><br>or drag & drop here
-        <input type="file" name="file" id="file-input" required />
-      </label>
-      <select name="target_format" required>
-        <option value="">Select target format</option>
-        <option value="pdf">PDF</option>
-        <option value="jpg">JPG</option>
-        <option value="png">PNG</option>
-        <option value="docx">DOCX</option>
-        <option value="txt">TXT</option>
-      </select>
-      <button type="submit">Convert</button>
-    </form>
+   <form action="/convert" method="post" enctype="multipart/form-data">
+  <div class="upload-section">
+    <label for="file-input" class="drop-zone" id="drop-zone">
+      <strong>Click to choose a file</strong><br>or drag & drop here
+      <input type="file" name="file" id="file-input" required />
+    </label>
+  </div>
+
+  <div class="format-section">
+    <select name="target_format" required>
+      <option value="">Select target format</option>
+      <option value="pdf">PDF</option>
+      <option value="jpg">JPG</option>
+      <option value="png">PNG</option>
+      <option value="docx">DOCX</option>
+      <option value="txt">TXT</option>
+    </select>
+  </div>
+
+  <button type="submit">Convert</button>
+</form>
+
   </div>
   <footer>Created by Archit Bishnoi • Education Hub</footer>
 
