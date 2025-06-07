@@ -1,14 +1,121 @@
+<!-- ======================= FRONTEND: education-hub.html ======================= -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>File Converter</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Education Hub - AI Chat</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f2f4f8;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    header {
+      width: 100%;
+      background: linear-gradient(to right, #4e54c8, #8f94fb);
+      padding: 20px;
+      color: white;
+      text-align: center;
+    }
+    .chatbox {
+      width: 100%;
+      max-width: 700px;
+      background: white;
+      margin-top: 20px;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    }
+    .chatlog {
+      min-height: 300px;
+      max-height: 500px;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      padding: 10px;
+      border-radius: 8px;
+      background: #fafafa;
+    }
+    .message {
+      margin: 10px 0;
+    }
+    .message.user { color: #4e54c8; font-weight: bold; }
+    .message.bot { color: #444; }
+    form {
+      margin-top: 10px;
+      display: flex;
+      gap: 10px;
+    }
+    input {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    button {
+      background: #4e54c8;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    footer {
+      margin-top: 40px;
+      color: #888;
+      font-size: 14px;
+    }
+  </style>
 </head>
 <body>
-    <h1>Upload a file to convert</h1>
-    <form action="/convert" method="post" enctype="multipart/form-data">
-        <input type="file" name="file" required>
-        <button type="submit">Convert</button>
+  <header>
+    <h1>Education Hub</h1>
+    <p>Created by Archit Bishnoi</p>
+  </header>
+  <div class="chatbox">
+    <div class="chatlog" id="chatlog"></div>
+    <form id="chatForm">
+      <input type="text" id="userInput" placeholder="Ask your question..." required />
+      <button type="submit">Ask</button>
     </form>
+  </div>
+  <footer>
+    &copy; <span id="year"></span> Education Hub
+  </footer>
+
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+    const form = document.getElementById("chatForm");
+    const chatlog = document.getElementById("chatlog");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const input = document.getElementById("userInput");
+      const question = input.value.trim();
+      if (!question) return;
+
+      chatlog.innerHTML += `<div class="message user">You: ${question}</div>`;
+      input.value = "";
+
+      try {
+        const res = await fetch("http://localhost:8080/ask", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: question })
+        });
+
+        if (!res.ok) throw new Error("Server error");
+        const data = await res.json();
+        chatlog.innerHTML += `<div class="message bot">AI: ${data.reply}</div>`;
+      } catch (err) {
+        chatlog.innerHTML += `<div class="message bot">Error: ${err.message}</div>`;
+      }
+
+      chatlog.scrollTop = chatlog.scrollHeight;
+    });
+  </script>
 </body>
 </html>
