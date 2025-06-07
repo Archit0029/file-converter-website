@@ -8,3 +8,4 @@ lxml
 itsdangerous
 colorama
 blinker
+pdf2image
