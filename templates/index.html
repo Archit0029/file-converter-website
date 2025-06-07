@@ -5,119 +5,168 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>File Converter | Education Hub</title>
   <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet"> 
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <style>
+    * {
+      box-sizing: border-box;
+      transition: 0.3s ease;
+    }
+
     body {
+      margin: 0;
       font-family: 'Inter', sans-serif;
       background: linear-gradient(135deg, #4facfe, #00f2fe);
-      margin: 0;
       display: flex;
-      flex-direction: column;
-      align-items: center;
       justify-content: center;
+      align-items: center;
       min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(8px);
+      padding: 40px 30px;
+      border-radius: 25px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      max-width: 480px;
+      width: 100%;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 5px;
       color: #333;
     }
-    .container {
-  background: white;
-  padding: 40px 40px; /* Increased padding */
-  border-radius: 20px;
-  box-shadow: 0 20px 30px rgba(0,0,0,0.15);
-  width: 95%;              /* Previously 90% */
-  max-width: 720px;        /* Previously 520px */
-  text-align: center;
-  transition: 0.3s ease-in-out;
-}
-    .container:hover {
-      transform: scale(1.01);
-    }
-    h1 {
-      margin-bottom: 5px;
-      font-size: 2rem;
-    }
-   .drop-zone {
-  border: 2px dashed #4facfe;
-  padding: 30px;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: 0.2s;
-  background-color: #f9f9f9;
-  margin-top: 20px;
-  margin-bottom: 20px; /* Add margin-bottom to separate from next element */
-}
 
-select {
-  margin-bottom: 20px; /* Add bottom margin to separate from button */
-}
+    p {
+      font-size: 1rem;
+      color: #555;
+      margin-bottom: 20px;
+    }
 
-button {
-  margin-bottom: 10px;
-}
+    .dropzone {
+      border: 2px dashed #4facfe;
+      border-radius: 15px;
+      padding: 30px 20px;
+      background-color: #f7fbff;
+      color: #666;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-bottom: 20px;
+    }
+
+    .dropzone:hover {
+      background-color: #e0f7ff;
+      color: #333;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    select {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      font-size: 1rem;
+      margin-bottom: 20px;
+      background-color: #fff;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      font-size: 1rem;
+      font-weight: 600;
+      color: white;
+      background: linear-gradient(to right, #4facfe, #00f2fe);
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    button:hover {
+      transform: scale(1.03);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+    }
+
+    .preview {
+      margin-top: 10px;
+      font-size: 0.9rem;
+      color: #333;
+      word-wrap: break-word;
+    }
 
     footer {
       margin-top: 30px;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       color: #fff;
+      text-align: center;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 30px 20px;
+      }
     }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>File Converter</h1>
-    <p>Convert any file to your desired format</p>
-   <form action="/convert" method="post" enctype="multipart/form-data">
-  <div class="upload-section">
-    <label for="file-input" class="drop-zone" id="drop-zone">
-      <strong>Click to choose a file</strong><br>or drag & drop here
-      <input type="file" name="file" id="file-input" required />
-    </label>
+    <p>Convert files to PDF, JPG, PNG, DOCX, or TXT</p>
+
+    <form action="/convert" method="post" enctype="multipart/form-data" id="uploadForm">
+      <label class="dropzone" id="dropzone">
+        Drag & drop or click to choose a file
+        <input type="file" name="file" id="fileInput" required />
+      </label>
+      <div class="preview" id="fileName">No file selected</div>
+
+      <select name="target_format" required>
+        <option value="">Select target format</option>
+        <option value="pdf">PDF</option>
+        <option value="jpg">JPG</option>
+        <option value="png">PNG</option>
+        <option value="docx">DOCX</option>
+        <option value="txt">TXT</option>
+      </select>
+
+      <button type="submit">Convert</button>
+    </form>
   </div>
 
-  <div class="format-section">
-    <select name="target_format" required>
-      <option value="">Select target format</option>
-      <option value="pdf">PDF</option>
-      <option value="jpg">JPG</option>
-      <option value="png">PNG</option>
-      <option value="docx">DOCX</option>
-      <option value="txt">TXT</option>
-    </select>
-  </div>
-
-  <button type="submit">Convert</button>
-</form>
-
-  </div>
   <footer>Created by Archit Bishnoi • Education Hub</footer>
 
   <script>
-    const dropZone = document.getElementById("drop-zone");
-    const fileInput = document.getElementById("file-input");
+    const dropzone = document.getElementById('dropzone');
+    const fileInput = document.getElementById('fileInput');
+    const fileName = document.getElementById('fileName');
 
-    // Drag over effect
-    dropZone.addEventListener("dragover", (e) => {
+    dropzone.addEventListener('click', () => fileInput.click());
+
+    fileInput.addEventListener('change', () => {
+      fileName.textContent = fileInput.files.length ? fileInput.files[0].name : 'No file selected';
+    });
+
+    dropzone.addEventListener('dragover', (e) => {
       e.preventDefault();
-      dropZone.classList.add("dragover");
+      dropzone.style.backgroundColor = "#e0f7ff";
     });
 
-    dropZone.addEventListener("dragleave", () => {
-      dropZone.classList.remove("dragover");
+    dropzone.addEventListener('dragleave', () => {
+      dropzone.style.backgroundColor = "";
     });
 
-    // Drop file
-    dropZone.addEventListener("drop", (e) => {
+    dropzone.addEventListener('drop', (e) => {
       e.preventDefault();
-      dropZone.classList.remove("dragover");
-
-      const files = e.dataTransfer.files;
-      if (files.length > 0) {
-        fileInput.files = files;
-      }
-    });
-
-    // Click area to open file chooser
-    dropZone.addEventListener("click", () => {
-      fileInput.click();
+      fileInput.files = e.dataTransfer.files;
+      fileName.textContent = e.dataTransfer.files.length ? e.dataTransfer.files[0].name : 'No file selected';
+      dropzone.style.backgroundColor = "";
     });
   </script>
 </body>
