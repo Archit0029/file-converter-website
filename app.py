@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, send_file
 from PIL import Image
 from fpdf import FPDF
-from pdf2image import convert_from_path
+import fitz  # PyMuPDF
 import os
 import mimetypes
 
