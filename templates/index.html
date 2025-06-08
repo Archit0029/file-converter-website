@@ -128,7 +128,45 @@
     </div>
   </main>
 
-  <script>
+  <script>async function uploadAndConvert() {
+  const fileInput = document.getElementById("file-upload");
+  const format = document.getElementById("format").value;
+
+  if (!fileInput.files.length) {
+    alert("Please select a file.");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("file", fileInput.files[0]);
+  formData.append("format", format);
+
+  try {
+    const response = await fetch("http://localhost:5000/convert", {
+      method: "POST",
+      body: formData
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      alert("Conversion failed: " + error.error);
+      return;
+    }
+
+    const blob = await response.blob();
+    const downloadUrl = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = downloadUrl;
+    link.download = "converted." + format;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+  } catch (err) {
+    alert("Error: " + err.message);
+  }
+}
+
     const firebaseConfig = {
       apiKey: "AIzaSyA-ExampleKey1234567890",
       authDomain: "ab-file-converter.firebaseapp.com",
