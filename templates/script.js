@@ -37,11 +37,10 @@ async function uploadAndConvert() {
   formData.append("format", format);
 
   try {
-    const response = await fetch("https://ab-file-converter-backend.onrender.com/convert", {
-      method: "POST",
-      body: formData
-    });
-
+   const response = await fetch("https://ab-file-converter-backend.onrender.com/convert", {
+  method: "POST",
+  body: formData
+});
     if (!response.ok) {
       const error = await response.json();
       alert("Conversion failed: " + error.error);
