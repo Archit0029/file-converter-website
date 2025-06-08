@@ -1,77 +1,207 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>File Converter | Education Hub</title>
-  <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AB File Converter | Archit Bishnoi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"></script>
   <style>
     body {
-      font-family: 'Inter', sans-serif;
-      background: linear-gradient(to right, #4facfe, #00f2fe);
       margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: #fff;
+      color: #111;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 40px;
+      border-bottom: 1px solid #eee;
+    }
+    header h1 {
+      font-size: 1.5rem;
+      display: flex;
+      align-items: center;
+    }
+    header h1 img {
+      width: 40px;
+      margin-right: 10px;
+    }
+    nav a {
+      margin-left: 20px;
+      text-decoration: none;
+      color: #111;
+      font-weight: 500;
+    }
+    main {
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      color: #333;
+      padding: 60px 20px;
     }
-    .container {
-      background: white;
-      padding: 30px;
-      border-radius: 15px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.1);
-      width: 90%;
-      max-width: 500px;
+    main h2 {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+    .upload-box {
+      border: 2px dashed #ccc;
+      border-radius: 10px;
+      padding: 40px;
       text-align: center;
-    }
-    h1 {
-      margin-bottom: 10px;
-    }
-    input, select, button {
-      margin: 10px 0;
-      padding: 12px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
+      max-width: 500px;
       width: 100%;
+      margin-bottom: 30px;
+    }
+    .upload-box input {
+      display: none;
+    }
+    .upload-box label {
+      display: inline-block;
+      padding: 12px 20px;
+      background: #d32f2f;
+      color: #fff;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    .upload-box select {
+      margin-left: 10px;
+      padding: 8px;
       font-size: 1rem;
     }
-    button {
-      background-color: #4facfe;
-      color: white;
-      border: none;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    button:hover {
-      background-color: #00c6ff;
-    }
-    footer {
+    .signin-options {
+      display: flex;
+      gap: 10px;
       margin-top: 30px;
-      font-size: 0.9rem;
-      color: #fff;
+    }
+    .signin-options button {
+      padding: 10px 16px;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      background: #fff;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .signin-options button img {
+      width: 20px;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>File Converter</h1>
-    <p>Convert any file to your desired format</p>
-    <form action="/convert" method="post" enctype="multipart/form-data">
-      <input type="file" name="file" required />
-      <select name="target_format" required>
-        <option value="">Select target format</option>
+  <header>
+    <h1><img src="https://upload.wikimedia.org/wikipedia/commons/8/8e/Cloud_upload_font_awesome_red.svg" alt="Logo">AB File Converter</h1>
+    <nav>
+      <a href="#">Convert</a>
+      <a href="#">Login</a>
+    </nav>
+  </header>
+
+  <main>
+    <h2>AB File Converter</h2>
+    <p>Archit Bishnoi</p>
+    <p>Convert your files easily & securely</p>
+
+    <div class="upload-box">
+      <p>Drop files here</p>
+      <input type="file" id="file-upload">
+      <label for="file-upload">Select File</label>
+      <select id="format">
         <option value="pdf">PDF</option>
         <option value="jpg">JPG</option>
         <option value="png">PNG</option>
-        <option value="docx">DOCX</option>
-        <option value="txt">TXT</option>
+        <option value="mp3">MP3</option>
       </select>
-      <button type="submit">Convert</button>
-    </form>
-  </div>
-  <footer>Created by Archit Bishnoi • Education Hub</footer>
+      <button onclick="uploadAndConvert()">Convert</button>
+    </div>
+
+    <div class="signin-options">
+      <button onclick="signInWithGoogle()"><img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg"> Google</button>
+      <button onclick="signInWithEmail()"><img src="https://upload.wikimedia.org/wikipedia/commons/4/4e/Mail_%28iOS%29.svg"> Email</button>
+      <button onclick="signInWithPhone()"><img src="https://upload.wikimedia.org/wikipedia/commons/3/3b/Phone_font_awesome.svg"> Mobile</button>
+    </div>
+  </main>
+
+  <script>async function uploadAndConvert() {
+  const fileInput = document.getElementById("file-upload");
+  const format = document.getElementById("format").value;
+
+  if (!fileInput.files.length) {
+    alert("Please select a file.");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("file", fileInput.files[0]);
+  formData.append("format", format);
+
+  try {
+    const response = await fetch("http://localhost:5000/convert", {
+      method: "POST",
+      body: formData
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      alert("Conversion failed: " + error.error);
+      return;
+    }
+
+    const blob = await response.blob();
+    const downloadUrl = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = downloadUrl;
+    link.download = "converted." + format;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+  } catch (err) {
+    alert("Error: " + err.message);
+  }
+}
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyA-ExampleKey1234567890",
+      authDomain: "ab-file-converter.firebaseapp.com",
+      projectId: "ab-file-converter",
+      storageBucket: "ab-file-converter.appspot.com",
+      messagingSenderId: "1234567890",
+      appId: "1:1234567890:web:abcdef123456"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    function signInWithGoogle() {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      auth.signInWithPopup(provider).then(res => alert('Signed in with Google'));
+    }
+
+    function signInWithEmail() {
+      const email = prompt('Enter your email:');
+      const password = prompt('Enter password:');
+      auth.signInWithEmailAndPassword(email, password)
+        .then(res => alert('Signed in with Email'))
+        .catch(err => alert('Error: ' + err.message));
+    }
+
+    function signInWithPhone() {
+      alert("OTP login requires phone number UI and reCAPTCHA container setup.");
+    }
+
+    function uploadAndConvert() {
+      const fileInput = document.getElementById("file-upload");
+      const format = document.getElementById("format").value;
+      if (!fileInput.files.length) return alert("Please select a file.");
+      alert("This will send file to backend to convert to " + format);
+    }
+  </script>
 </body>
 </html>
