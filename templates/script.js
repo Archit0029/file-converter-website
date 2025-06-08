@@ -60,4 +60,7 @@ async function uploadAndConvert() {
   } catch (err) {
     alert("Error: " + err.message);
   }
+  document.getElementById('auth-section').style.display = 'none';
+document.getElementById('convert-section').style.display = 'block';
+
 }
