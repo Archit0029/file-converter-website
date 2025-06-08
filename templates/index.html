@@ -1,214 +1,169 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>File Converter | Education Hub</title>
-  <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AB File Converter | Archit Bishnoi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"></script>
   <style>
-    * {
-      box-sizing: border-box;
-      transition: 0.3s ease;
-    }
-
     body {
       margin: 0;
       font-family: 'Inter', sans-serif;
-      background: linear-gradient(135deg, #4facfe, #00f2fe);
+      background: #fff;
+      color: #111;
+    }
+    header {
       display: flex;
-      justify-content: center;
+      justify-content: space-between;
       align-items: center;
-      min-height: 100vh;
-      padding: 20px;
+      padding: 20px 40px;
+      border-bottom: 1px solid #eee;
     }
-
-    .container {
-      background: white;
-      padding: 40px;
-      border-radius: 20px;
-      box-shadow: 0 20px 30px rgba(0,0,0,0.15);
-      width: 95%;
-      max-width: 720px;
-      text-align: center;
+    header h1 {
+      font-size: 1.5rem;
+      display: flex;
+      align-items: center;
     }
-
-    h1 {
+    header h1 img {
+      width: 40px;
+      margin-right: 10px;
+    }
+    nav a {
+      margin-left: 20px;
+      text-decoration: none;
+      color: #111;
+      font-weight: 500;
+    }
+    main {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 60px 20px;
+    }
+    main h2 {
       font-size: 2rem;
-      margin-bottom: 5px;
-      color: #333;
+      margin-bottom: 0.5rem;
     }
-
-    p {
-      font-size: 1rem;
-      color: #555;
-      margin-bottom: 20px;
+    .upload-box {
+      border: 2px dashed #ccc;
+      border-radius: 10px;
+      padding: 40px;
+      text-align: center;
+      max-width: 500px;
+      width: 100%;
+      margin-bottom: 30px;
     }
-
-    .dropzone {
-      border: 2px dashed #4facfe;
-      border-radius: 15px;
-      padding: 30px 20px;
-      background-color: #f7fbff;
-      color: #666;
-      font-size: 1rem;
-      cursor: pointer;
-      margin-bottom: 20px;
-    }
-
-    .dropzone:hover {
-      background-color: #e0f7ff;
-      color: #333;
-    }
-
-    input[type="file"] {
+    .upload-box input {
       display: none;
     }
-
-    select {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      font-size: 1rem;
-      margin-bottom: 20px;
-      background-color: #fff;
-    }
-
-    button {
-      width: 100%;
-      padding: 14px;
-      font-size: 1rem;
-      font-weight: 600;
-      color: white;
-      background: linear-gradient(to right, #4facfe, #00f2fe);
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-
-    button:hover {
-      transform: scale(1.03);
-      box-shadow: 0 6px 16px rgba(0,0,0,0.2);
-    }
-
-    .preview {
-      margin-top: 10px;
-      font-size: 0.9rem;
-      color: #333;
-      word-wrap: break-word;
-    }
-
-    .flash-messages {
-      margin-bottom: 15px;
-    }
-
-    .flash {
-      background: #d1f7d6;
-      color: #0a6e0a;
-      padding: 10px;
-      border-radius: 8px;
-      margin-bottom: 10px;
-      font-weight: bold;
-    }
-
-    .download-link {
+    .upload-box label {
       display: inline-block;
-      margin-top: 15px;
-      padding: 12px 18px;
-      background-color: #28a745;
-      color: white;
-      border-radius: 8px;
-      text-decoration: none;
-      font-weight: 600;
-    }
-
-    .download-link:hover {
-      background-color: #218838;
-    }
-
-    footer {
-      margin-top: 30px;
-      font-size: 0.85rem;
+      padding: 12px 20px;
+      background: #d32f2f;
       color: #fff;
-      text-align: center;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-top: 10px;
     }
-
-    @media (max-width: 600px) {
-      .container {
-        padding: 30px 20px;
-      }
+    .upload-box select {
+      margin-left: 10px;
+      padding: 8px;
+      font-size: 1rem;
+    }
+    .signin-options {
+      display: flex;
+      gap: 10px;
+      margin-top: 30px;
+    }
+    .signin-options button {
+      padding: 10px 16px;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      background: #fff;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .signin-options button img {
+      width: 20px;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>File Converter</h1>
-    <p>Convert files to PDF, JPG, PNG, DOCX, or TXT</p>
+  <header>
+    <h1><img src="https://upload.wikimedia.org/wikipedia/commons/8/8e/Cloud_upload_font_awesome_red.svg" alt="Logo">AB File Converter</h1>
+    <nav>
+      <a href="#">Convert</a>
+      <a href="#">Login</a>
+    </nav>
+  </header>
 
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        <div class="flash-messages">
-          {% for message in messages %}
-            <div class="flash">{{ message }}</div>
-          {% endfor %}
-        </div>
-      {% endif %}
-    {% endwith %}
+  <main>
+    <h2>AB File Converter</h2>
+    <p>Archit Bishnoi</p>
+    <p>Convert your files easily & securely</p>
 
-    <form action="/convert" method="post" enctype="multipart/form-data" id="uploadForm">
-      <label class="dropzone" id="dropzone">
-        Drag & drop or click to choose a file
-        <input type="file" name="file" id="fileInput" required />
-      </label>
-      <div class="preview" id="fileName">No file selected</div>
-
-      <select name="target_format" required>
-        <option value="">Select target format</option>
+    <div class="upload-box">
+      <p>Drop files here</p>
+      <input type="file" id="file-upload">
+      <label for="file-upload">Select File</label>
+      <select id="format">
         <option value="pdf">PDF</option>
         <option value="jpg">JPG</option>
         <option value="png">PNG</option>
-        <option value="docx">DOCX</option>
-        <option value="txt">TXT</option>
+        <option value="mp3">MP3</option>
       </select>
+      <button onclick="uploadAndConvert()">Convert</button>
+    </div>
 
-      <button type="submit">Convert</button>
-    </form>
-
-    {% if download_url %}
-      <a href="{{ download_url }}" class="download-link" download>⬇ Download Converted File</a>
-    {% endif %}
-  </div>
-
-  <footer>Created by Archit Bishnoi • Education Hub</footer>
+    <div class="signin-options">
+      <button onclick="signInWithGoogle()"><img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg"> Google</button>
+      <button onclick="signInWithEmail()"><img src="https://upload.wikimedia.org/wikipedia/commons/4/4e/Mail_%28iOS%29.svg"> Email</button>
+      <button onclick="signInWithPhone()"><img src="https://upload.wikimedia.org/wikipedia/commons/3/3b/Phone_font_awesome.svg"> Mobile</button>
+    </div>
+  </main>
 
   <script>
-    const dropzone = document.getElementById('dropzone');
-    const fileInput = document.getElementById('fileInput');
-    const fileName = document.getElementById('fileName');
+    const firebaseConfig = {
+      apiKey: "AIzaSyA-ExampleKey1234567890",
+      authDomain: "ab-file-converter.firebaseapp.com",
+      projectId: "ab-file-converter",
+      storageBucket: "ab-file-converter.appspot.com",
+      messagingSenderId: "1234567890",
+      appId: "1:1234567890:web:abcdef123456"
+    };
 
-    dropzone.addEventListener('click', () => fileInput.click());
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
 
-    fileInput.addEventListener('change', () => {
-      fileName.textContent = fileInput.files.length ? fileInput.files[0].name : 'No file selected';
-    });
+    function signInWithGoogle() {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      auth.signInWithPopup(provider).then(res => alert('Signed in with Google'));
+    }
 
-    dropzone.addEventListener('dragover', (e) => {
-      e.preventDefault();
-      dropzone.style.backgroundColor = "#e0f7ff";
-    });
+    function signInWithEmail() {
+      const email = prompt('Enter your email:');
+      const password = prompt('Enter password:');
+      auth.signInWithEmailAndPassword(email, password)
+        .then(res => alert('Signed in with Email'))
+        .catch(err => alert('Error: ' + err.message));
+    }
 
-    dropzone.addEventListener('dragleave', () => {
-      dropzone.style.backgroundColor = "";
-    });
+    function signInWithPhone() {
+      alert("OTP login requires phone number UI and reCAPTCHA container setup.");
+    }
 
-    dropzone.addEventListener('drop', (e) => {
-      e.preventDefault();
-      fileInput.files = e.dataTransfer.files;
-      fileName.textContent = e.dataTransfer.files.length ? e.dataTransfer.files[0].name : 'No file selected';
-      dropzone.style.backgroundColor = "";
-    });
+    function uploadAndConvert() {
+      const fileInput = document.getElementById("file-upload");
+      const format = document.getElementById("format").value;
+      if (!fileInput.files.length) return alert("Please select a file.");
+      alert("This will send file to backend to convert to " + format);
+    }
   </script>
 </body>
 </html>
