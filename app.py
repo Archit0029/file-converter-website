@@ -2,11 +2,11 @@ from flask import Flask, request, send_file, jsonify
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
 import os
-from PIL import Image
 import uuid
+from PIL import Image
 
 app = Flask(__name__)
-CORS(app)  # Allow frontend access
+CORS(app)
 
 UPLOAD_FOLDER = 'uploads'
 CONVERTED_FOLDER = 'converted'
@@ -24,23 +24,18 @@ def convert_file():
 
     file = request.files['file']
     output_format = request.form['format']
-    if file.filename == '':
-        return jsonify({'error': 'No selected file'}), 400
-
     filename = secure_filename(file.filename)
     input_path = os.path.join(UPLOAD_FOLDER, filename)
     file.save(input_path)
 
-    name, ext = os.path.splitext(filename)
-    output_filename = f"{name}_{uuid.uuid4().hex}.{output_format}"
-    output_path = os.path.join(CONVERTED_FOLDER, output_filename)
-
     try:
         img = Image.open(input_path)
+        output_filename = f"{uuid.uuid4().hex}.{output_format}"
+        output_path = os.path.join(CONVERTED_FOLDER, output_filename)
         img.save(output_path, output_format.upper())
         return send_file(output_path, as_attachment=True)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=10000)
