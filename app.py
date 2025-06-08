@@ -1,71 +1,46 @@
 from flask import Flask, request, send_file, jsonify
 from flask_cors import CORS
-import os
 from werkzeug.utils import secure_filename
-from io import BytesIO
+import os
 from PIL import Image
-from pydub import AudioSegment
-from fpdf import FPDF
+import uuid
 
 app = Flask(__name__)
-CORS(app)
+CORS(app)  # Allow frontend access
 
 UPLOAD_FOLDER = 'uploads'
+CONVERTED_FOLDER = 'converted'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+os.makedirs(CONVERTED_FOLDER, exist_ok=True)
 
 @app.route('/')
 def home():
-    return "AB File Converter Backend is running."
+    return "AB file converter backend is running."
 
 @app.route('/convert', methods=['POST'])
-def convert():
+def convert_file():
     if 'file' not in request.files or 'format' not in request.form:
-        return jsonify({"error": "File and format required"}), 400
+        return jsonify({'error': 'Missing file or format'}), 400
 
     file = request.files['file']
-    target_format = request.form['format'].lower()
+    output_format = request.form['format']
+    if file.filename == '':
+        return jsonify({'error': 'No selected file'}), 400
+
     filename = secure_filename(file.filename)
     input_path = os.path.join(UPLOAD_FOLDER, filename)
     file.save(input_path)
 
     name, ext = os.path.splitext(filename)
-    output_path = os.path.join(UPLOAD_FOLDER, f"{name}.{target_format}")
+    output_filename = f"{name}_{uuid.uuid4().hex}.{output_format}"
+    output_path = os.path.join(CONVERTED_FOLDER, output_filename)
 
     try:
-        if target_format in ['jpg', 'png']:
-            img = Image.open(input_path)
-            img.save(output_path, format=target_format.upper())
-
-        elif target_format in ['mp3', 'wav']:
-            sound = AudioSegment.from_file(input_path)
-            sound.export(output_path, format=target_format)
-
-        elif target_format == 'pdf':
-            img = Image.open(input_path).convert('RGB')
-            img.save(output_path, format='PDF')
-
-        elif ext.lower() == '.txt' and target_format == 'pdf':
-            pdf = FPDF()
-            pdf.add_page()
-            pdf.set_font("Arial", size=12)
-            with open(input_path, 'r') as f:
-                for line in f:
-                    pdf.cell(200, 10, txt=line.strip(), ln=True)
-            pdf.output(output_path)
-
-        else:
-            return jsonify({"error": "Unsupported conversion"}), 400
-
+        img = Image.open(input_path)
+        img.save(output_path, output_format.upper())
         return send_file(output_path, as_attachment=True)
-
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-    finally:
-        try:
-            os.remove(input_path)
-        except:
-            pass
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    app.run(debug=True)
