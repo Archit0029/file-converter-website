@@ -21,7 +21,7 @@ def allowed_file(filename):
 
 @app.route('/')
 def home():
-    return "AB File Converter backend is running."
+    return render_template('index.html')
 
 @app.route('/convert', methods=['POST'])
 def convert_file():
