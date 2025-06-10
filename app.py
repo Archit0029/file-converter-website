@@ -1,49 +1,86 @@
-from flask import Flask, request, send_file, jsonify
+from flask import Flask, render_template, request, redirect, url_for, session, send_file, flash
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
+from PIL import Image
 import os
 import uuid
-from PIL import Image
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+import random
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
 
+# Config
+app.secret_key = os.getenv("SECRET_KEY")
 UPLOAD_FOLDER = 'uploads'
 CONVERTED_FOLDER = 'converted'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(CONVERTED_FOLDER, exist_ok=True)
 
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'bmp', 'gif'}
-FORMAT_MAP = {'jpg': 'JPEG', 'jpeg': 'JPEG', 'png': 'PNG', 'bmp': 'BMP', 'gif': 'GIF'}
+# Email settings
+EMAIL_SENDER = os.getenv("EMAIL_SENDER")
+EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
 
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+# In-memory store for OTP (temporary)
+otp_store = {}
 
-from flask import Flask
-
-app = Flask(__name__)
- @app.route('/')
-def home():
-    return render_template('login.html')  # or index.html
 @app.route('/')
-def home():
-    return 'AB file converter backend is running.'
+def login():
+    return render_template('login.html')
+
+@app.route('/send_otp', methods=['POST'])
+def send_otp():
+    email = request.form['email']
+    otp = str(random.randint(100000, 999999))
+    otp_store[email] = otp
+
+    msg = MIMEMultipart()
+    msg['From'] = EMAIL_SENDER
+    msg['To'] = email
+    msg['Subject'] = "Your OTP for AB File Converter"
+    msg.attach(MIMEText(f"Your OTP is: {otp}", 'plain'))
+
+    try:
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.starttls()
+        server.login(EMAIL_SENDER, EMAIL_PASSWORD)
+        server.send_message(msg)
+        server.quit()
+        session['email'] = email
+        return render_template('otp_verify.html')
+    except Exception as e:
+        return f"Error sending email: {e}"
+
+@app.route('/verify_otp', methods=['POST'])
+def verify_otp():
+    entered_otp = request.form['otp']
+    email = session.get('email')
+    if email and otp_store.get(email) == entered_otp:
+        session['logged_in'] = True
+        return redirect(url_for('dashboard'))
+    else:
+        flash("Invalid OTP")
+        return redirect(url_for('login'))
+
+@app.route('/dashboard')
+def dashboard():
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
+    return render_template('dashboard.html')
+
 @app.route('/convert', methods=['POST'])
 def convert_file():
     if 'file' not in request.files or 'format' not in request.form:
-        return jsonify({'error': 'Missing file or format'}), 400
+        return "Missing file or format", 400
 
     file = request.files['file']
-    output_format = request.form['format'].lower()
+    output_format = request.form['format']
     filename = secure_filename(file.filename)
-
-    if not allowed_file(filename):
-        return jsonify({'error': 'Unsupported file type'}), 400
-
-    save_format = FORMAT_MAP.get(output_format)
-    if not save_format:
-        return jsonify({'error': 'Unsupported output format'}), 400
-
     input_path = os.path.join(UPLOAD_FOLDER, filename)
     file.save(input_path)
 
@@ -51,12 +88,15 @@ def convert_file():
         img = Image.open(input_path)
         output_filename = f"{uuid.uuid4().hex}.{output_format}"
         output_path = os.path.join(CONVERTED_FOLDER, output_filename)
-        img.save(output_path, save_format)
+        img.save(output_path, output_format.upper())
         return send_file(output_path, as_attachment=True)
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        return f"Conversion error: {e}", 500
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('login'))
 
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 10000))
-    app.run(host='0.0.0.0', port=port)
-
+    app.run(debug=True, host='0.0.0.0', port=5000)
