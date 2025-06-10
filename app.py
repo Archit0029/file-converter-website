@@ -22,14 +22,12 @@ def allowed_file(filename):
 from flask import Flask
 
 app = Flask(__name__)
-
+ @app.route('/')
+def home():
+    return render_template('login.html')  # or index.html
 @app.route('/')
 def home():
     return 'AB file converter backend is running.'
-    @app.route('/')
-def home():
-    return render_template('login.html')  # or index.html
-
 @app.route('/convert', methods=['POST'])
 def convert_file():
     if 'file' not in request.files or 'format' not in request.form:
