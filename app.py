@@ -13,9 +13,15 @@ CONVERTED_FOLDER = 'converted'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(CONVERTED_FOLDER, exist_ok=True)
 
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'bmp', 'gif'}
+FORMAT_MAP = {'jpg': 'JPEG', 'jpeg': 'JPEG', 'png': 'PNG', 'bmp': 'BMP', 'gif': 'GIF'}
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 @app.route('/')
 def home():
-    return "AB file converter backend is running."
+    return "AB File Converter backend is running."
 
 @app.route('/convert', methods=['POST'])
 def convert_file():
@@ -23,8 +29,16 @@ def convert_file():
         return jsonify({'error': 'Missing file or format'}), 400
 
     file = request.files['file']
-    output_format = request.form['format']
+    output_format = request.form['format'].lower()
     filename = secure_filename(file.filename)
+
+    if not allowed_file(filename):
+        return jsonify({'error': 'Unsupported file type'}), 400
+
+    save_format = FORMAT_MAP.get(output_format)
+    if not save_format:
+        return jsonify({'error': 'Unsupported output format'}), 400
+
     input_path = os.path.join(UPLOAD_FOLDER, filename)
     file.save(input_path)
 
@@ -32,7 +46,7 @@ def convert_file():
         img = Image.open(input_path)
         output_filename = f"{uuid.uuid4().hex}.{output_format}"
         output_path = os.path.join(CONVERTED_FOLDER, output_filename)
-        img.save(output_path, output_format.upper())
+        img.save(output_path, save_format)
         return send_file(output_path, as_attachment=True)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
