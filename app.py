@@ -26,6 +26,9 @@ app = Flask(__name__)
 @app.route('/')
 def home():
     return 'AB file converter backend is running.'
+    @app.route('/')
+def home():
+    return render_template('login.html')  # or index.html
 
 @app.route('/convert', methods=['POST'])
 def convert_file():
