@@ -19,9 +19,13 @@ FORMAT_MAP = {'jpg': 'JPEG', 'jpeg': 'JPEG', 'png': 'PNG', 'bmp': 'BMP', 'gif': 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+from flask import Flask
+
+app = Flask(__name__)
+
 @app.route('/')
 def home():
-    return render_template('index.html')
+    return 'AB file converter backend is running.'
 
 @app.route('/convert', methods=['POST'])
 def convert_file():
