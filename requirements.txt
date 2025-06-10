@@ -1,5 +1,4 @@
 Flask
-fpdf
 Pillow
 python-docx
 werkzeug
@@ -9,10 +8,8 @@ itsdangerous
 colorama
 blinker
 PyMuPDF
-Flask
-flask-cors
-Pillow
 pydub
 fpdf
 gunicorn
 flask-cors
+dotenv
