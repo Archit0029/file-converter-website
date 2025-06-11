@@ -1,17 +1,24 @@
 <!-- templates/otp_verify.html -->
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>OTP Verification</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/otp-verify.css') }}">
+    <meta charset="UTF-8">
+    <title>Verify OTP - AB File Converter</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/otp-verify.css') }}">
 </head>
 <body>
-  <div class="otp-container">
-    <h2>Verify OTP</h2>
-    <form method="POST" action="/verify_otp">
-      <input type="text" name="otp" placeholder="Enter OTP" required />
-      <button type="submit">Verify</button>
-    </form>
-  </div>
+    <div class="glass-card">
+        <h2>Enter OTP</h2>
+        <form method="POST" action="/verify_otp">
+            <input type="text" name="otp" placeholder="Enter OTP" required>
+            <input type="hidden" name="email" value="{{ email }}">
+            <button type="submit">Verify</button>
+        </form>
+    </div>
+
+    <!-- Optional particles background -->
+    {% for i in range(10) %}
+    <div class="particle" style="left: {{ loop.index * 10 }}%; animation-delay: {{ loop.index * 1.5 }}s;"></div>
+    {% endfor %}
 </body>
 </html>
