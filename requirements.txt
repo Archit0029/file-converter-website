@@ -7,3 +7,4 @@ Pillow==10.3.0
 flask_mail
 PyPDF2
 pdf2image
+pytesseract
