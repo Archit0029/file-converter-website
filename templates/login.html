@@ -1,16 +1,16 @@
-<!-- templates/login.html -->
+<!-- login.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Send OTP - AB File Converter</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/otp-send.css') }}">
+    <title>Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
 </head>
 <body>
-    <div class="container">
-        <h2>Send OTP to Login</h2>
-        <form method="POST" action="/send_otp">
-            <input type="email" name="email" placeholder="Enter your email" required>
+    <div class="login-container">
+        <h2>Login with Gmail</h2>
+        <form action="/send_otp" method="post">
+            <input type="email" name="email" placeholder="Enter your Gmail" required>
             <button type="submit">Send OTP</button>
         </form>
     </div>
