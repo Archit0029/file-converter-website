@@ -11,3 +11,4 @@ pytesseract==0.3.10
 moviepy==1.0.3
 opencv-python==4.9.0.80
 reportlab==4.1.0
+PyPDF2
