@@ -1,20 +1,18 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>AB File Converter</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AB File Converter</title>
+  <link rel="stylesheet" href="/static/css/index.css" />
 </head>
 <body>
-    <div class="hero">
-        <div class="overlay"></div>
-        <div class="content">
-            <h1>Welcome to AB File Converter</h1>
-            <p>Convert files easily — PDF, Image, Audio, Video, Text — all in one place.</p>
-            <a href="{{ url_for('login') }}" class="btn">Get Started</a>
-        </div>
+  <div class="hero-container">
+    <div class="hero-text">
+      <h1>Welcome to AB File Converter</h1>
+      <p>Convert Files Easily – PDF, Images, Audio, and More</p>
+      <a href="/login"><button>Get Started</button></a>
     </div>
+  </div>
 </body>
 </html>
