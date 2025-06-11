@@ -18,16 +18,16 @@ CONVERTED_FOLDER = 'converted'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(CONVERTED_FOLDER, exist_ok=True)
 
-# Flask-Mail config (use your app password!)
+# Flask-Mail configuration
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = 'architbishnoi177@gmail.com'  # Your Gmail
-app.config['MAIL_PASSWORD'] = 'exoa iimg qxkj obhu'         # App password
+app.config['MAIL_PASSWORD'] = 'exoa iimg qxkj obhu'          # App password
 
 mail = Mail(app)
 
-# Home - Login Page
+# Home Route (Login Page)
 @app.route('/')
 def home():
     return render_template('login.html')
@@ -41,7 +41,7 @@ def send_otp():
     session['otp'] = otp
 
     try:
-        msg = Message('Your OTP Code - AB File Converter', sender=app.config['MAIL_USERNAME'], recipients=[email])
+        msg = Message('Your OTP - AB File Converter', sender=app.config['MAIL_USERNAME'], recipients=[email])
         msg.body = f'Your OTP is: {otp}'
         mail.send(msg)
         return render_template('otp_verify.html', email=email)
@@ -58,14 +58,14 @@ def verify_otp():
         flash('Invalid OTP. Please try again.')
         return redirect('/')
 
-# Dashboard - After OTP Verified
+# Dashboard
 @app.route('/dashboard')
 def dashboard():
     if 'email' not in session:
         return redirect('/')
     return render_template('dashboard.html')
 
-# Convert File
+# File Conversion Logic
 @app.route('/convert', methods=['POST'])
 def convert_file():
     if 'file' not in request.files or 'format' not in request.form:
@@ -96,7 +96,7 @@ def convert_file():
                 img_path = os.path.join(CONVERTED_FOLDER, f"{uuid.uuid4().hex}_{i}.jpg")
                 page.save(img_path, 'JPEG')
                 img_paths.append(img_path)
-            return send_file(img_paths[0], as_attachment=True)
+            return send_file(img_paths[0], as_attachment=True)  # Return first image
 
         elif output_format == 'ocr':
             img = Image.open(input_path)
@@ -112,12 +112,13 @@ def convert_file():
     except Exception as e:
         return f"Conversion error: {str(e)}", 500
 
-# Logout (optional)
+# Logout
 @app.route('/logout')
 def logout():
     session.clear()
     return redirect('/')
 
-# Run Server
+# Bind to Render's dynamic port
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
