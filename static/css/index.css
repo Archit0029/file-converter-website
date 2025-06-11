@@ -1,61 +1,37 @@
-/* static/css/index.css */
-
+/* index.css */
 body, html {
     margin: 0;
     padding: 0;
-    font-family: 'Segoe UI', sans-serif;
     height: 100%;
-    overflow: hidden;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
-
-.background {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, #141e30, #243b55);
-    animation: gradientFlow 10s infinite alternate;
-    z-index: -1;
-}
-
-@keyframes gradientFlow {
-    0% {
-        background-position: 0% 50%;
-    }
-    100% {
-        background-position: 100% 50%;
-    }
-}
-
-.main {
-    text-align: center;
+.hero {
+    background: url('https://images.unsplash.com/photo-1612832021114-e4d72a14ef41') no-repeat center center/cover;
+    height: 100vh;
     position: relative;
-    top: 30%;
-    transform: translateY(-30%);
-    color: #fff;
-}
-
-.main h1 {
-    font-size: 3em;
-    margin-bottom: 10px;
-}
-
-.main p {
-    font-size: 1.2em;
-    margin-bottom: 30px;
-    color: #ddd;
-}
-
-.btn {
-    background-color: #00c6ff;
-    padding: 12px 30px;
-    border: none;
     color: white;
-    text-decoration: none;
-    border-radius: 30px;
-    font-size: 1em;
-    transition: background 0.4s ease;
 }
-
-.btn:hover {
-    background-color: #0072ff;
+.overlay {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+}
+.content {
+    position: relative;
+    z-index: 2;
+    top: 50%;
+    transform: translateY(-50%);
+    text-align: center;
+}
+.content h1 {
+    font-size: 3rem;
+}
+.btn {
+    background-color: #00b894;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    text-decoration: none;
 }
