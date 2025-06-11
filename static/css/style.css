@@ -66,3 +66,70 @@ footer {
   font-size: 14px;
   color: #888;
 }
+/* General reset and font */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+.container {
+  background: #fff;
+  padding: 40px 30px;
+  border-radius: 20px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.container h2 {
+  margin-bottom: 20px;
+  color: #333;
+  font-weight: 600;
+  font-size: 24px;
+}
+
+input[type="email"],
+input[type="text"] {
+  width: 100%;
+  padding: 12px 15px;
+  margin: 12px 0;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+  transition: 0.3s ease;
+}
+
+input:focus {
+  border-color: #2575fc;
+  outline: none;
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  background: #2575fc;
+  color: white;
+  font-size: 16px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  margin-top: 10px;
+}
+
+button:hover {
+  background: #1e63d8;
+}
+
+.note {
+  margin-top: 15px;
+  color: #888;
+  font-size: 14px;
+}
