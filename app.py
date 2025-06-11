@@ -13,8 +13,8 @@ CORS(app)
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = 'your_email@gmail.com'
-app.config['MAIL_PASSWORD'] = 'your_app_password'
+app.config['MAIL_USERNAME'] = 'architbishnoi177@gmail.com'
+app.config['MAIL_PASSWORD'] = 'exoaiimgqxkjobhu'
 mail = Mail(app)
 
 UPLOAD_FOLDER = 'uploads'
