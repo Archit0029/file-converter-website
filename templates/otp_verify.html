@@ -1,19 +1,17 @@
+<!-- templates/otp_verify.html -->
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Verify OTP - AB File Converter</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <title>OTP Verification</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-  <div class="container">
-    <h2>Email OTP Verification</h2>
-    <form action="/verify-otp" method="POST">
+  <div class="otp-container">
+    <h2>Verify OTP</h2>
+    <form method="POST" action="/verify_otp">
       <input type="text" name="otp" placeholder="Enter OTP" required />
       <button type="submit">Verify</button>
     </form>
-    <p>If you didn't receive an OTP, <a href="/">go back</a> to resend.</p>
   </div>
 </body>
 </html>
