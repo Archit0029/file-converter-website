@@ -1,78 +1,65 @@
-from flask import Flask, render_template, request, redirect, url_for, session, send_file, flash
+# app.py
+from flask import Flask, request, render_template, redirect, url_for, session, send_file, flash
 from flask_mail import Mail, Message
+from flask_cors import CORS
+import os, random, uuid
 from werkzeug.utils import secure_filename
-from PyPDF2 import PdfReader
-from pdf2image import convert_from_path
 from PIL import Image
-import pytesseract
-import os
-import random
-import uuid
 
 app = Flask(__name__)
-app.secret_key = 'your_secret_key_here'
+app.secret_key = 'your-secret-key'
+CORS(app)
 
-# Folder setup
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = 'your_email@gmail.com'
+app.config['MAIL_PASSWORD'] = 'your_app_password'
+mail = Mail(app)
+
 UPLOAD_FOLDER = 'uploads'
 CONVERTED_FOLDER = 'converted'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(CONVERTED_FOLDER, exist_ok=True)
 
-# Flask-Mail configuration
-app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-app.config['MAIL_PORT'] = 587
-app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = 'architbishnoi177@gmail.com'  # Your Gmail
-app.config['MAIL_PASSWORD'] = 'exoa iimg qxkj obhu'          # App password
-
-mail = Mail(app)
-
 @app.route('/')
 def index():
     return render_template('index.html')
-# Home Route (Login Page)
-@app.route('/')
-def home():
+
+@app.route('/login')
+def login():
     return render_template('login.html')
 
-# Send OTP
 @app.route('/send_otp', methods=['POST'])
 def send_otp():
     email = request.form['email']
-    otp = str(random.randint(100000, 999999))
+    otp = str(random.randint(1000, 9999))
     session['email'] = email
     session['otp'] = otp
-
     try:
-        msg = Message('Your OTP - AB File Converter', sender=app.config['MAIL_USERNAME'], recipients=[email])
+        msg = Message('Your OTP Code', sender=app.config['MAIL_USERNAME'], recipients=[email])
         msg.body = f'Your OTP is: {otp}'
         mail.send(msg)
-        return render_template('otp_verify.html', email=email)
+        return render_template('otp_verify.html')
     except Exception as e:
         return f"Error sending email: {e}"
 
-# Verify OTP
 @app.route('/verify_otp', methods=['POST'])
 def verify_otp():
-    entered_otp = request.form['otp']
-    if entered_otp == session.get('otp'):
-        return redirect('/dashboard')
+    otp_entered = request.form['otp']
+    if otp_entered == session.get('otp'):
+        return redirect(url_for('dashboard'))
     else:
-        flash('Invalid OTP. Please try again.')
-        return redirect('/')
+        return "Invalid OTP. Please try again."
 
-# Dashboard
 @app.route('/dashboard')
 def dashboard():
-    if 'email' not in session:
-        return redirect('/')
     return render_template('dashboard.html')
 
-# File Conversion Logic
 @app.route('/convert', methods=['POST'])
-def convert_file():
+def convert():
     if 'file' not in request.files or 'format' not in request.form:
-        return "Missing file or format", 400
+        return "Missing file or format"
 
     file = request.files['file']
     output_format = request.form['format']
@@ -81,47 +68,35 @@ def convert_file():
     file.save(input_path)
 
     try:
-        if output_format == 'txt':
-            reader = PdfReader(input_path)
-            text = ""
-            for page in reader.pages:
-                text += page.extract_text() or ""
-            output_filename = f"{uuid.uuid4().hex}.txt"
-            output_path = os.path.join(CONVERTED_FOLDER, output_filename)
-            with open(output_path, "w", encoding="utf-8") as f:
-                f.write(text)
-            return send_file(output_path, as_attachment=True)
+        output_filename = f"{uuid.uuid4().hex}.{output_format}"
+        output_path = os.path.join(CONVERTED_FOLDER, output_filename)
 
-        elif output_format == 'jpg':
-            pages = convert_from_path(input_path)
-            img_paths = []
-            for i, page in enumerate(pages):
-                img_path = os.path.join(CONVERTED_FOLDER, f"{uuid.uuid4().hex}_{i}.jpg")
-                page.save(img_path, 'JPEG')
-                img_paths.append(img_path)
-            return send_file(img_paths[0], as_attachment=True)  # Return first image
-
-        elif output_format == 'ocr':
+        if output_format in ['png', 'jpg']:
             img = Image.open(input_path)
-            text = pytesseract.image_to_string(img)
-            output_path = os.path.join(CONVERTED_FOLDER, f"{uuid.uuid4().hex}.txt")
-            with open(output_path, 'w') as f:
-                f.write(text)
-            return send_file(output_path, as_attachment=True)
+            img.save(output_path, output_format.upper())
+        elif output_format == 'txt':
+            import PyPDF2
+            with open(input_path, 'rb') as f:
+                reader = PyPDF2.PdfReader(f)
+                text = "\n".join(page.extract_text() for page in reader.pages)
+                with open(output_path, 'w') as out:
+                    out.write(text)
+        elif output_format == 'mp4':
+            from moviepy.editor import AudioFileClip
+            audio = AudioFileClip(input_path)
+            audio.write_videofile(output_path)
+        elif output_format == 'txt-img':
+            from PIL import ImageDraw, ImageFont
+            text = open(input_path, 'r').read()
+            img = Image.new('RGB', (800, 400), color=(255, 255, 255))
+            d = ImageDraw.Draw(img)
+            d.text((10,10), text, fill=(0,0,0))
+            img.save(output_path)
 
-        else:
-            return "Unsupported conversion type", 400
-
+        return send_file(output_path, as_attachment=True)
     except Exception as e:
-        return f"Conversion error: {str(e)}", 500
+        return f"Conversion error: {e}"
 
-# Logout
-@app.route('/logout')
-def logout():
-    session.clear()
-    return redirect('/')
-
-# Bind to Render's dynamic port
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port)
+    app.run(debug=True, port=5000)
+    
