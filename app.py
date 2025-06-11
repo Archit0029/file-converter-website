@@ -27,6 +27,9 @@ app.config['MAIL_PASSWORD'] = 'exoa iimg qxkj obhu'          # App password
 
 mail = Mail(app)
 
+@app.route('/')
+def index():
+    return render_template('index.html')
 # Home Route (Login Page)
 @app.route('/')
 def home():
