@@ -1,78 +1,71 @@
 from flask import Flask, render_template, request, redirect, url_for, session, send_file, flash
-from flask_cors import CORS
+from flask_mail import Mail, Message
 from werkzeug.utils import secure_filename
+from PyPDF2 import PdfReader
+from pdf2image import convert_from_path
 from PIL import Image
+import pytesseract
 import os
-import uuid
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
 import random
-from dotenv import load_dotenv
-
-load_dotenv()
+import uuid
 
 app = Flask(__name__)
-CORS(app)
+app.secret_key = 'your_secret_key_here'
 
-# Config
-app.secret_key = os.getenv("SECRET_KEY")
+# Folder setup
 UPLOAD_FOLDER = 'uploads'
 CONVERTED_FOLDER = 'converted'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(CONVERTED_FOLDER, exist_ok=True)
 
-# Email settings
-EMAIL_SENDER = os.getenv("EMAIL_SENDER")
-EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
+# Flask-Mail config (use your app password!)
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = 'architbishnoi177@gmail.com'  # Your Gmail
+app.config['MAIL_PASSWORD'] = 'exoa iimg qxkj obhu'         # App password
 
-# In-memory store for OTP (temporary)
-otp_store = {}
+mail = Mail(app)
 
+# Home - Login Page
 @app.route('/')
-def login():
+def home():
     return render_template('login.html')
 
+# Send OTP
 @app.route('/send_otp', methods=['POST'])
 def send_otp():
     email = request.form['email']
     otp = str(random.randint(100000, 999999))
-    otp_store[email] = otp
-
-    msg = MIMEMultipart()
-    msg['From'] = EMAIL_SENDER
-    msg['To'] = email
-    msg['Subject'] = "Your OTP for AB File Converter"
-    msg.attach(MIMEText(f"Your OTP is: {otp}", 'plain'))
+    session['email'] = email
+    session['otp'] = otp
 
     try:
-        server = smtplib.SMTP('smtp.gmail.com', 587)
-        server.starttls()
-        server.login(EMAIL_SENDER, EMAIL_PASSWORD)
-        server.send_message(msg)
-        server.quit()
-        session['email'] = email
-        return render_template('otp_verify.html')
+        msg = Message('Your OTP Code - AB File Converter', sender=app.config['MAIL_USERNAME'], recipients=[email])
+        msg.body = f'Your OTP is: {otp}'
+        mail.send(msg)
+        return render_template('otp_verify.html', email=email)
     except Exception as e:
         return f"Error sending email: {e}"
 
+# Verify OTP
 @app.route('/verify_otp', methods=['POST'])
 def verify_otp():
     entered_otp = request.form['otp']
-    email = session.get('email')
-    if email and otp_store.get(email) == entered_otp:
-        session['logged_in'] = True
-        return redirect(url_for('dashboard'))
+    if entered_otp == session.get('otp'):
+        return redirect('/dashboard')
     else:
-        flash("Invalid OTP")
-        return redirect(url_for('login'))
+        flash('Invalid OTP. Please try again.')
+        return redirect('/')
 
+# Dashboard - After OTP Verified
 @app.route('/dashboard')
 def dashboard():
-    if not session.get('logged_in'):
-        return redirect(url_for('login'))
+    if 'email' not in session:
+        return redirect('/')
     return render_template('dashboard.html')
 
+# Convert File
 @app.route('/convert', methods=['POST'])
 def convert_file():
     if 'file' not in request.files or 'format' not in request.form:
@@ -85,18 +78,46 @@ def convert_file():
     file.save(input_path)
 
     try:
-        img = Image.open(input_path)
-        output_filename = f"{uuid.uuid4().hex}.{output_format}"
-        output_path = os.path.join(CONVERTED_FOLDER, output_filename)
-        img.save(output_path, output_format.upper())
-        return send_file(output_path, as_attachment=True)
-    except Exception as e:
-        return f"Conversion error: {e}", 500
+        if output_format == 'txt':
+            reader = PdfReader(input_path)
+            text = ""
+            for page in reader.pages:
+                text += page.extract_text() or ""
+            output_filename = f"{uuid.uuid4().hex}.txt"
+            output_path = os.path.join(CONVERTED_FOLDER, output_filename)
+            with open(output_path, "w", encoding="utf-8") as f:
+                f.write(text)
+            return send_file(output_path, as_attachment=True)
 
+        elif output_format == 'jpg':
+            pages = convert_from_path(input_path)
+            img_paths = []
+            for i, page in enumerate(pages):
+                img_path = os.path.join(CONVERTED_FOLDER, f"{uuid.uuid4().hex}_{i}.jpg")
+                page.save(img_path, 'JPEG')
+                img_paths.append(img_path)
+            return send_file(img_paths[0], as_attachment=True)
+
+        elif output_format == 'ocr':
+            img = Image.open(input_path)
+            text = pytesseract.image_to_string(img)
+            output_path = os.path.join(CONVERTED_FOLDER, f"{uuid.uuid4().hex}.txt")
+            with open(output_path, 'w') as f:
+                f.write(text)
+            return send_file(output_path, as_attachment=True)
+
+        else:
+            return "Unsupported conversion type", 400
+
+    except Exception as e:
+        return f"Conversion error: {str(e)}", 500
+
+# Logout (optional)
 @app.route('/logout')
 def logout():
     session.clear()
-    return redirect(url_for('login'))
+    return redirect('/')
 
+# Run Server
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True, port=5000)
