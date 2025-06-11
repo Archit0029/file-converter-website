@@ -1,18 +1,19 @@
-<!-- login.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Login</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login - AB File Converter</title>
+  <link rel="stylesheet" href="/static/css/login.css" />
 </head>
 <body>
-    <div class="login-container">
-        <h2>Login with Gmail</h2>
-        <form action="/send_otp" method="post">
-            <input type="email" name="email" placeholder="Enter your Gmail" required>
-            <button type="submit">Send OTP</button>
-        </form>
-    </div>
+  <div class="login-container">
+    <h1>Login with Gmail</h1>
+    <form action="/send-otp" method="POST">
+      <input type="email" name="email" placeholder="Enter your Gmail" required />
+      <button type="submit">Send OTP</button>
+    </form>
+    <p class="note">We'll send a one-time password to your email.</p>
+  </div>
 </body>
 </html>
