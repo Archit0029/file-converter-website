@@ -133,7 +133,3 @@ def logout():
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
-
-
-Would you like me to proceed with the full front-end code (index.html, login.html, otp_verify.html, dashboard.html, and all CSS files) now?
-
