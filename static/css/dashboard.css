@@ -1,17 +1,72 @@
-/* dashboard.css */
-.dashboard {
-    padding: 40px;
-    background-color: #fafafa;
-    text-align: center;
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #1e3c72, #2a5298);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  padding: 30px 20px;
 }
-.dashboard input, .dashboard select {
-    padding: 10px;
-    margin: 10px;
+
+.dashboard-container {
+  text-align: center;
+  max-width: 700px;
+  width: 100%;
 }
-.dashboard button {
-    background-color: #2ecc71;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
+
+h1 {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+}
+
+.subtitle {
+  font-size: 1.2rem;
+  margin-bottom: 30px;
+}
+
+.upload-area {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 30px;
+  border-radius: 12px;
+  border: 2px dashed #fff;
+  transition: 0.3s;
+}
+
+.upload-area.highlight {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.button {
+  display: inline-block;
+  background: #00c6ff;
+  color: #fff;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-bottom: 15px;
+}
+
+select, button.convert-btn {
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  font-size: 16px;
+  margin-top: 10px;
+  width: 100%;
+  max-width: 300px;
+}
+
+button.convert-btn {
+  background-color: #00ff95;
+  color: #000;
+  margin-top: 20px;
+}
+
+#message {
+  margin-top: 20px;
+  font-weight: bold;
+  color: #ffcccb;
 }
