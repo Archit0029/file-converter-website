@@ -25,6 +25,9 @@ EMAIL_ADDRESS = 'architbishnoi177@gmail.com'
 EMAIL_PASSWORD = 'exoaiimgqxkjobhu'
 
 otp_store = {}
+@app.route('/sitemap.xml')
+def sitemap():
+    return send_from_directory('static', 'sitemap.xml')
 @app.route('/login')
 def login():
     return render_template('login.html')
