@@ -3,7 +3,8 @@
 
 ![OmniConvert Banner](https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&h=400&q=80)
 
-[![Vercel Deployment](https://img.shields.io/badge/Deploy-Vercel-black?style=for-the-badge&logo=vercel)](https://architbishnoi-portfolio.vercel.app/)
+[![Vercel Deployment](https://img.shields.io/badge/Deploy-Vercel-black?style=for-the-badge&logo=vercel)](https://file-converter-website.vercel.app/)
+[![Live Demo](https://img.shields.io/badge/Live_Site-file--converter--website.vercel.app-success?style=for-the-badge&logo=vercel)](https://file-converter-website.vercel.app/)
 [![GitHub Repo](https://img.shields.io/badge/GitHub-file--converter--website-181717?style=for-the-badge&logo=github)](https://github.com/Archit0029/file-converter-website)
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![React 18](https://img.shields.io/badge/React_18-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactjs.org/)
