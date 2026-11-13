@@ -38,6 +38,15 @@ export function App() {
     }
   }, [darkMode]);
 
+  useEffect(() => {
+    const path = window.location.pathname.replace(/^\//, '').toLowerCase();
+    const hash = window.location.hash.replace(/^#/, '').toLowerCase();
+    const target = path || hash;
+    if (target) {
+      handleOpenTool(target);
+    }
+  }, []);
+
   const handleOpenTool = (toolId: string) => {
     if (toolId === 'edit-pdf' || toolId === 'pdf-editor') {
       setActiveModal('edit-pdf');
