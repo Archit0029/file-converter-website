@@ -3,8 +3,8 @@
 
 ![OmniConvert Banner](https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&h=400&q=80)
 
-[![Vercel Deployment](https://img.shields.io/badge/Deploy-Vercel-black?style=for-the-badge&logo=vercel)](https://omniconvert.vercel.app/)
-[![Live Demo](https://img.shields.io/badge/Live_Site-omniconvert.vercel.app-success?style=for-the-badge&logo=vercel)](https://omniconvert.vercel.app/)
+[![Vercel Deployment](https://img.shields.io/badge/Deploy-Vercel-black?style=for-the-badge&logo=vercel)](https://omnifile-convert.vercel.app/)
+[![Live Demo](https://img.shields.io/badge/Live_Site-omnifile--convert.vercel.app-success?style=for-the-badge&logo=vercel)](https://omnifile-convert.vercel.app/)
 [![GitHub Repo](https://img.shields.io/badge/GitHub-file--converter--website-181717?style=for-the-badge&logo=github)](https://github.com/Archit0029/file-converter-website)
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![React 18](https://img.shields.io/badge/React_18-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactjs.org/)
@@ -140,14 +140,12 @@ npm run preview
 ### Method 1: Automatic Deployment via GitHub (Recommended)
 1. Go to [Vercel Dashboard](https://vercel.com/new).
 2. Click **Add New Project** and select your GitHub repository `Archit0029/file-converter-website`.
-3. In **Project Name**, enter: `omniconvert` (this will automatically assign `https://omniconvert.vercel.app/`).
+3. In **Project Name**, enter: `omnifile-convert` (or your chosen custom domain).
 4. Vercel automatically detects **Vite**:
    - **Framework Preset**: `Vite`
    - **Build Command**: `npm run build`
    - **Output Directory**: `dist`
-5. Click **Deploy**. Your site will be live on `https://omniconvert.vercel.app/` in under 60 seconds!
-
-> **Note on Custom/Existing Domains**: If `omniconvert.vercel.app` is already reserved by someone globally on Vercel, you can set it to `omniconvert-app.vercel.app` or `omniconvert-archit.vercel.app` in your Vercel Project Settings > Domains.
+5. Click **Deploy**. Your site is live on `https://omnifile-convert.vercel.app/`!
 
 ### Method 2: Vercel CLI
 ```bash
