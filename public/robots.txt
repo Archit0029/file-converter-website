@@ -1,0 +1,5 @@
+# Robots.txt for OmniConvert by Archit Bishnoi
+User-agent: *
+Allow: /
+
+Sitemap: https://omniconvert.architbishnoi.dev/sitemap.xml
